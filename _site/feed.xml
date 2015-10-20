@@ -1,40 +1,476 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Your awesome title</title>
+    <title>_THE_  spaghetti_code_ball</title>
     <description>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
 </description>
-    <link>http://yourdomain.com/</link>
-    <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 20 Oct 2015 14:44:59 +0200</pubDate>
-    <lastBuildDate>Tue, 20 Oct 2015 14:44:59 +0200</lastBuildDate>
+    <link>http://vwwv.github.io/</link>
+    <atom:link href="http://vwwv.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Tue, 20 Oct 2015 20:45:05 +0000</pubDate>
+    <lastBuildDate>Tue, 20 Oct 2015 20:45:05 +0000</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
-        <title>Welcome to Jekyll!</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code&gt;jekyll serve --watch&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+        <title>EasyBitcoin example: Creating a command-line wallet.(2/2)</title>
+        <description>&lt;p&gt;Hi! On the &lt;a href=&quot;/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html&quot;&gt;last post&lt;/a&gt; we spoke about doing a command-line 
+bitcoin wallet using Haskell and the &lt;code&gt;EasyBitcoin&lt;/code&gt; library; we have already introduced the protocol, so now it’s time to get our 
+hand dirty and start coding!&lt;/p&gt;
 
-&lt;p&gt;To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+&lt;h3 id=&quot;creating-our-own-simplified-wallet&quot;&gt;Creating our own (simplified) wallet:&lt;/h3&gt;
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+&lt;p&gt;Our wallet will be rather simple, we’ll rely on a 3º party provider to deal with the  p2p network communication, so we won’t 
+need to install any additional software :) . Most of the time, applications communicate with the bitcoin network through a 
+bitcoin-client hosted by themselves, this way they don’t need to rely anyone. In any case, from the code 
+point of view, there’s no much different between calling our own client or a 3º party: it is just about adapting to their 
+exposed API.&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Tom&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &amp;#39;Hi, Tom&amp;#39; to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So let’s start importing the libraries, types and functions will need!&lt;/p&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://github.com/jekyll/jekyll-help&quot;&gt;Jekyll’s dedicated Help repository&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;cm&quot;&gt;{-# LANGUAGE DataKinds, OverloadedStrings, MultiWayIf #-}&lt;/span&gt;
+
+
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Network.EasyBitcoin&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Address&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;-- ^ a bitcoin address.&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;address&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;-- ^ this function derivates addresses from Keys&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;BTC&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;-- ^ represent an amount of bitcoin&lt;/span&gt;
+        
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;btc&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;-- ^ takes a Double and interprets it as btc &lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   (notice bitcoin are often expressed on subunits such mBtc or satoshis&lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   , so it important to express which units are we using)&lt;/span&gt;
+        
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;TestNet&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;-- ^ Instead of using normal bitcoin, we&amp;#39;ll use&lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   testnet bitcoin, which are similar but free, so we&lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   can play with them without fearing losing actual money.&lt;/span&gt;
+
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Key&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;-- ^ Represents cryptographic keys, it has 2 phantom types&lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   to codify whether it is public or private, and in which&lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   network (such testnet) they are supposed to be used&lt;/span&gt;
+
+                       &lt;span class=&quot;c1&quot;&gt;-- | We&amp;#39;ll only use private keys. &lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Visibility&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Private&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Tx&lt;/span&gt;           &lt;span class=&quot;c1&quot;&gt;-- ^ A bitcoin transaction.&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Txid&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;-- ^ A bitcoin transaction identifier.&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;txid&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;-- ^ Computes the Txid from a Tx&lt;/span&gt;
+
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Outpoint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;-- ^ A Txid plus an index representing a reference to &lt;/span&gt;
+                        &lt;span class=&quot;c1&quot;&gt;--   a transaction output.&lt;/span&gt;
+        
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;transaction&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;-- ^ Given a list of reference to transaction outputs, the &lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   private keys to sign them and a list of addresses &lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   and amount where to send the btc&amp;#39;s, it creates a&lt;/span&gt;
+                       &lt;span class=&quot;c1&quot;&gt;--   signed, ready to use, transaction. &lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Of course that would not be enough, we’ll also need to read from command line, communicate with the 3º party using 
+HTTP request and we’ll need to parse and compose those requests.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;System.Environment&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;-- ^ To read from command line   &lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getArgs&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                        
+
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Network.Wreq&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;-- ^ To send HTTP requests.&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;responseBody&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;      
+
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.Aeson&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;-- ^ To compose JSON values&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                       
+
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.Aeson.Lens&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;-- ^ To parse JSON values.&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_JSON&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Control.Lens&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;-- ^ To make it easier parsing&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;toListOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_Just&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;--   JSON values &lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;And some common helpers:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Safe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readMay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Control.Applicative&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.Maybe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;listToMaybe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fromMaybe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;We’ll use a constant secret private key from which our receiving address will be derivate, and that we use to sign our outgoing
+transaction.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;secret&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Key&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;TestNet&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;secret&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;tprv8ZgxMBicQKsPcsbCVeqqF1KVdH7gwDJbxbzpCxDUsoXHdb6SnTPYxdwSAKYr9mrdtPfo3MkHsmViXxedm6MJD59TMuhj9vprD9UpGKnStwq&amp;quot;&lt;/span&gt;  
+
+&lt;span class=&quot;nf&quot;&gt;our_address&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;address&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secret&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Nowadays, most wallets generate a new address for each incoming transaction, this way we can track who has paid us and also it helps
+enhancing the user’s financial privacy. Usually it has a random secret root, and from this root they derivate new 
+key pairs for each new address, following some &lt;a href=&quot;https://en.bitcoin.it/wiki/Deterministic_wallet&quot;&gt;deterministic derivation&lt;/a&gt; schema 
+like the &lt;a href=&quot;https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki&quot;&gt;BIP0032&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Though &lt;code&gt;EasyBitcoin&lt;/code&gt; has special support for BIP0032, we’ll keep things simple and use only one key and address.&lt;/p&gt;
+
+&lt;h4 id=&quot;implementing-main-procedures&quot;&gt;Implementing main procedures:&lt;/h4&gt;
+
+&lt;p&gt;So what should a wallet do? At least it should be able receive funds, check its current balance, and send funds to any valid
+address; Let’s write down these usage cases:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getArgs&lt;/span&gt;
+          &lt;span class=&quot;kr&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;of&lt;/span&gt;
+           &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;print_address&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;                &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;print_address&lt;/span&gt;
+           &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;check_balance&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;                &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;check_balance&lt;/span&gt;
+           &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;send_bitcoins&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;     &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readMay&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to_&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readMay&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount_&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;                    &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;send_bitcoins&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; 
+ 
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;otherwise&lt;/span&gt;                     &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Address and/or amount to send could not be parsed.&amp;quot;&lt;/span&gt;
+           &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;                                &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;help&lt;/span&gt;
+                       
+  &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;help&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unlines&lt;/span&gt;
+         &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Undefined action, correct syntax is:&amp;quot;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;   wallet check_balance : to check current balance.&amp;quot;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;   wallet print_address : to print the address where to receive funds&amp;quot;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;   wallet send_bitcoins &amp;lt;address&amp;gt; &amp;lt;amount&amp;gt; :&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; 
+               &lt;span class=&quot;s&quot;&gt;&amp;quot; to send the specific amount (measured in btc) to the specific address&amp;quot;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;So now, we only need to implement &lt;code&gt;print_address&lt;/code&gt;, &lt;code&gt;check_balance&lt;/code&gt; and &lt;code&gt;send_bitcoins&lt;/code&gt; and we’ll be done. The first
+of the 3 procedure looks rather difficult&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;print_address&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;our_address&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Yes, it was even worse than expected!!&lt;/p&gt;
+
+&lt;p&gt;To compute our balance (&lt;code&gt;check_balance&lt;/code&gt;), we’ll ask the 3º party about the 
+&lt;a href=&quot;https://bitcoin.org/en/glossary/unspent-transaction-output&quot;&gt;UTXO&lt;/a&gt; pointing to our address, and we’ll sum them. We’ll distinguish
+those confirmed (with 1 or more confirmations) and those funds yet to be confirmed.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;check_balance&lt;/span&gt;&lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;check_balance&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readBlockExplorer&lt;/span&gt;
+                   
+                   &lt;span class=&quot;kr&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;confirmed&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+                       &lt;span class=&quot;n&quot;&gt;all_funds&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+                   
+                   &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;all_funds&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot; BTCs ( &amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;confirmed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot; confirmed )&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now, in order to implement &lt;code&gt;send_bitcoins&lt;/code&gt;, we need to compose a transaction, and send it to the 3º party so it can broadcast it into 
+the p2p bitcoin network. For a transaction to be valid, it needs to reference the same or more bitcoin from UTXO, than the one it is sending 
+(otherwise we could send more btc than what we have). But before we should check:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;We actually have enough bitcoins to send.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The amount to send is not to small… transactions with tiny outputs are considered spam and rejected by the network (If doesn’t matter if
+we are sending 1€ million  and paying $1 million on commission, currently, it is just have a single output too small, it will be considered
+spam).&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The difference between the btc’s from the UTXO’s and the one sending will be lost as a fee, if this amount is too big, we can solve this 
+problem adding another output back to ourself sending some of the remaining btc’s.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;But if the difference is not big enough, doing that would lead us to the problem we were trying to solve on point 2.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;send_bitcoins&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;BTC&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;TestNet&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Address&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;TestNet&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;send_bitcoins&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to_send&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;addr&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; 
+    &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;utxos&lt;/span&gt;           &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readBlockExplorer&lt;/span&gt;
+        
+        &lt;span class=&quot;kr&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;utxo&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sending&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;selectOutputs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to_send&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fee&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;utxos&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;remaining&lt;/span&gt;       &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sending&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to_send&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fee&lt;/span&gt;
+
+        &lt;span class=&quot;kr&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remaining&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;         &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Not enough funds.&amp;quot;&lt;/span&gt;
+
+           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to_send&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;threshold&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Amount to send too small, considered dust.&amp;quot;&lt;/span&gt;
+
+           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remaining&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;threshold&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;send&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;out&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;utxo&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to_send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                                                          &lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;our_address&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;remaining&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+
+           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remaining&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;threshold&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;send&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;out&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;utxo&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to_send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                                                          &lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;We have forget to define some important parameters, ¿How much fee to pay?, ¿Where should be that threshold?
+¿How do we select the UTXOs to use among all the available ones? For the first and second one we can check 
+and hardcore the recommended values (they change as the network’s load and bitcoin price evolves); But the 
+second one is a bit more complicated: if we want to select the best combination of UTXOs such it minimize the
+remaining returned funds (that will need around 10 extra minutes to get back confirmed), we’ll face 
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Knapsack_problem&quot;&gt;the Knapsack problem&lt;/a&gt; which is NP-complete in the general 
+case. &lt;/p&gt;
+
+&lt;p&gt;So as simple criteria to select a UTXO, we’ll use:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;We’ll prefer confirmed over no confirmed.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If equally confirmed, we’ll arbitrarily prefer those with biggest Txid. (As Txid are derived from 
+hashes, this would be close to pick one randomly).&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;threshold&lt;/span&gt;   &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0002&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;fee&lt;/span&gt;         &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0001&lt;/span&gt;
+
+
+&lt;span class=&quot;nf&quot;&gt;selectOutputs&lt;/span&gt;&lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;BTC&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;net&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Outpoint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;BTC&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Outpoint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;BTC&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;selectOutputs&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;total&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fromMaybe&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+                    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;listToMaybe&lt;/span&gt;   
+                    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dropWhile&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;total&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;snd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;         
+                    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scanl&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                
+                    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reverse&lt;/span&gt; 
+                    &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sort&lt;/span&gt;    
+      &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;outputs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;outputs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;implementing-the-requests&quot;&gt;Implementing the requests:&lt;/h4&gt;
+
+&lt;p&gt;As we mentioned, we used 3º party, in our case, a block explorer, particularly &lt;a href=&quot;blockr.io&quot;&gt;blockr.io&lt;/a&gt;, but any one would work,
+as they are most of them quiet similar. Actually, it would only take a few changes to adapt it so it can use our own bitcoind
+client.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span class=&quot;nf&quot;&gt;server&lt;/span&gt;      &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;https://tbtc.blockr.io/api/v1/&amp;quot;&lt;/span&gt; 
+
+
+&lt;span class=&quot;nf&quot;&gt;send&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Tx&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;net&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt; 
+&lt;span class=&quot;nf&quot;&gt;send&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tx&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;hex&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tx&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+             &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Transaction broadcasted, txid = &amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;txid&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+   &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;tx/push&amp;quot;&lt;/span&gt;
+
+
+
+&lt;span class=&quot;nf&quot;&gt;readBlockExplorer&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Outpoint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;BTC&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;TestNet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;readBlockExplorer&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;toListOf&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extractUtxo&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;
+
+ &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt; 
+   &lt;span class=&quot;n&quot;&gt;extractUtxo&lt;/span&gt;       &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;responseBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;unspent&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parseOutpoint&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_Just&lt;/span&gt;
+
+
+   &lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;          &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;address/unspent/&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;our_address&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;?unconfirmed=1&amp;quot;&lt;/span&gt;
+
+   &lt;span class=&quot;n&quot;&gt;parseOutpoint&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;txid&lt;/span&gt;      &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;tx&amp;quot;&lt;/span&gt;            &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_JSON&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readMay&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_Just&lt;/span&gt;
+                          &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;         &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;n&amp;quot;&lt;/span&gt;             &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_JSON&lt;/span&gt;
+                          
+                          &lt;span class=&quot;c1&quot;&gt;-- | -- WARNING: amount is shown as String by Blockr.io&lt;/span&gt;
+                          &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;    &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;amount&amp;quot;&lt;/span&gt;        &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_JSON&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readMay&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_Just&lt;/span&gt; 
+                          
+                          &lt;span class=&quot;n&quot;&gt;confirmed&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;^?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;confirmations&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_JSON&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;ow&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+                          &lt;span class=&quot;n&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;confirmed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Outpoint&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;txid&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;btc&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;time-to-play&quot;&gt;Time to play:&lt;/h4&gt;
+
+&lt;p&gt;So we have finally finished and our implementation is ready to be used! I already sent some tBTC so you can already start
+making some transactions (unless someone has done them before you).&lt;/p&gt;
+
+&lt;p&gt;If you want to create your own version, don’t forget to use a different &lt;code&gt;secret&lt;/code&gt; (as It is posted on a blog I guess 
+is not really a “secret”). The &lt;code&gt;EasyBitcoin&lt;/code&gt; library accept both WIF and BIP0032 as format for its &lt;code&gt;Read&lt;/code&gt; instance.&lt;/p&gt;
+
+&lt;p&gt;If you want to use the official bitcoin’d’ client, just adapt procedure &lt;code&gt;send&lt;/code&gt; and &lt;code&gt;readBlockExplorer&lt;/code&gt; to use 
+&lt;a href=&quot;https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list&quot;&gt;its API&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;You can find the &lt;code&gt;EasyBitcoin&lt;/code&gt; documentation on &lt;a href=&quot;www.example.com&quot;&gt;hackage&lt;/a&gt;; or just fire me a comment and I’ll try my best 
+to help :) &lt;/p&gt;
 
 </description>
-        <pubDate>Tue, 20 Oct 2015 16:42:46 +0200</pubDate>
-        <link>http://yourdomain.com/jekyll/update/2015/10/20/welcome-to-jekyll.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/jekyll/update/2015/10/20/welcome-to-jekyll.html</guid>
+        <pubDate>Wed, 21 Oct 2015 14:42:46 +0000</pubDate>
+        <link>http://vwwv.github.io/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html</link>
+        <guid isPermaLink="true">http://vwwv.github.io/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html</guid>
         
         
-        <category>jekyll</category>
+        <category>haskell</category>
         
-        <category>update</category>
+        <category>easy-bitcoin</category>
+        
+      </item>
+    
+      <item>
+        <title>EasyBitcoin example: Creating a command-line wallet.(1/2)</title>
+        <description>&lt;p&gt;Hi! In this post I’ll introduce you &lt;code&gt;EasyBitcoin&lt;/code&gt;, a simple bitcoin haskell library I wrote as a fork from &lt;code&gt;Haskoin&lt;/code&gt;; Which is a 
+great library, but after using it for a while I thought it would be fun adapting its API to something I would feel more comfortable 
+with. The library provide types and instances related with transactions, keys, addresses and escrows, and pure functions to handle 
+them as well, but it does not provide support for the protocol communication; that is, you still would need to connect to a bitcoin 
+client ( or a 3º party service) if you want to interact with other peers. &lt;/p&gt;
+
+&lt;p&gt;In order to present &lt;code&gt;EasyBitcoin&lt;/code&gt;, I’ll show how to write a simple command-line wallet using this library and a 3º party provider:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;First, I’ll make a quick overview of the bitcoin protocol for those who might not be that familiar with it; just to
+understand the application, so if you know a bit about the protocol, you can just skip this section. &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On the second &lt;a href=&quot;/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html&quot;&gt;part&lt;/a&gt;, I’ll introduce the actual code 
+for the application, the interesting stuff.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The library’s documentation can be found &lt;a href=&quot;www.example.com&quot;&gt;on hackage&lt;/a&gt;, and its source code &lt;a href=&quot;www.example.com&quot;&gt;on github&lt;/a&gt;. If you find 
+some trouble with it or have some suggestions I’d really apreciate your input; This is the first library I wrote, and to be honest, 
+I still feel there’s so much I need to learn from the haskell community.  &lt;/p&gt;
+
+&lt;h3 id=&quot;a-brief-introduction-to-bitcoin&quot;&gt;A Brief introduction to Bitcoin:&lt;/h3&gt;
+
+&lt;p&gt;Bitcoin is a P2P protocol where a set of peers communicate with each other to keep and modify a ledger of balances; these balances are 
+measured using a unit called bitcoin (just like the protocol’s name but without using capital letter), this unit can be divided up to 
+8 digits, this way you can also find mili-bitcoin, micro-bitcoin…etc. The aim of Bitcoin is to provide a foundation for a better 
+financial system: from an user point of view, it is sometimes hard to appreciate what are the current problems and limitations associated 
+with the current payment/bank system, and that’s why lot of people wonder why bitcoin are even needed. But I’m pretty sure those who have
+ worked on the technical side of the financial sector would have quiet a different opinion, whether bitcoin is the best thing ever or 
+ just fade, there’s no doubt, the financial sector is investing each day more on technology looking for fresh innovation. (Actually the
+sector has been many time compared with dinosaurs due to its size and its inability to find technical innovation to its problems).&lt;/p&gt;
+
+&lt;h4 id=&quot;bitcoin-transactions&quot;&gt;Bitcoin transactions:&lt;/h4&gt;
+
+&lt;p&gt;In order to keep this balance ledger, peers share a global distributed database of transactions, and modify it by pushing new transactions 
+to it; though peers can only push and never directly remove(*), it is possible for some recently added transactions to get lost as 
+peer synchronize their view of the global state (as you probably know, it is impossible for a distributed system to &lt;a href=&quot;https://en.wikipedia.org/wiki/CAP_theorem&quot;&gt;be simultaneously 
+consistent, available and tolerant to partitions&lt;/a&gt; ). Some malicious peer can try to used
+ this situation to temporally &lt;a href=&quot;https://en.bitcoin.it/wiki/Double-spending#Race_attack&quot;&gt;fake payments&lt;/a&gt;. This global distributed database 
+of transactions is the so called &lt;a href=&quot;https://en.wikipedia.org/wiki/Block_chain_%28database%29&quot;&gt;blockchain&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Though conceptually seen similar to ordinary payment transactions, where an amount of money is withdrawn from an account A into an account 
+B, the Bitcoin protocol lacks the concept of accounts; instead, each transaction is defined as a set of transaction-inputs representing 
+payments received and transactions-outputs representing payments sent: Each transaction-output is defined as an amount to send and an 
+“ownership challenge”, each transaction-input is defined as an “ownership challenge solution” and a reference to a former transaction-output 
+&lt;strong&gt;not referenced before by another transaction-input from any other transaction&lt;/strong&gt;. To be a valid transaction, the sum of the inputs 
+referenced sent amount shall be the same as the sum of the outputs sent amount (plus an small fee implicitly defined as the difference between 
+the input minus the outputs).&lt;/p&gt;
+
+&lt;p&gt;The transaction issuer decide the implicit fee it has to pay, and could be any non-negative amount including zero. The higher the amount, 
+the higher the chances the network will collaborate to include its transaction into the distributed database of transactions.&lt;/p&gt;
+
+&lt;p&gt;When a reference to a transaction-output has not been referenced yet by some transaction input, it is called &lt;strong&gt;UTXO&lt;/strong&gt;(unspent 
+transaction output). Within the &lt;em&gt;EasyBitcoin&lt;/em&gt; library, references to transaction-outputs (whether they’ve been referenced or not) are 
+called &lt;strong&gt;Outpoint&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Hypothetical bank account balance:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;+  43 € received from transaction &#39;3169eb88-5b6c-465c-bbb9-d322a4626457&#39; at 2012-04-23
++ 132 € received from transaction &#39;c4d51e23-1c96-40e7-9b10-8e6d278fbc5b&#39; at 2013-07-13
+-  80 € sent       on transaction &#39;74d31f58-7dad-470b-a03f-28f70ffce82d&#39; at 2014-01-01
+-   1 € fee
+--------------------------------------------------------------------------------------
+   94 € current balance hold as today  2015-10-15
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An actual &lt;a href=&quot;https://www.blocktrail.com/BTC/tx/ffe58cb9762dca10f085dcfc2549635a0dacf5653d71d3e9491e47780a05771c&quot;&gt;bitcoin transaction&lt;/a&gt;
+(id: &lt;strong&gt;bd37285a0d42c0811b63b5942a3fd7b0d8ba292a135a2350b2bad460a16f17cf&lt;/strong&gt; ):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; input #0 (from transaction e1018f7fd13f3f410e5efac7cb26173f32494d8ceb3fce93ee995bd34fbf86fd 
+                  output #0  10.55196835 BTC
+          )
+ input #1 (from transaction c34f64222fb4bf6630d90c15d82c94881bea944632c29116b74644b084caeb8d 
+                  output #0 130.51303223 BTC
+          )
+ input #2 (from transaction edf1c527f933dd7d7e50afcc09951b68035bbaf4e29ecda1051ad1a6b7e404e8 
+                  output #0  15.62078170 BTC
+          )
+ input #3 (from transaction 1c921420abd9243143a59f99d2c2e04f4d9e00178f2e1f6281df18ccf8a6d553 
+                  output #2   1.59475184 BTC
+          ) 
+---------------------------------------------------------------------------------------------
+ 157.35400000 BTC output #0 
+   0.88671799 BTC output #1
+   0.03970000 BTC output #2
+---------------------------------------------------------------------------------------------
+   0.00011613 BTC implicit fee
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;bitcoin-ownership&quot;&gt;Bitcoin ownership:&lt;/h4&gt;
+
+&lt;p&gt;So, what does it means to own a certain amount of bitcoins? We say we own an specific amount of bitcoins if we can create a 
+bitcoin transaction having an output with that specific amount as amount to send.&lt;/p&gt;
+
+&lt;p&gt;If somebody creates a transaction having an output with an “ownership challenge” we can solve, that means will be able to 
+reference that output from our hypothetical transaction, and therefore increasing the amount of bitcoin we own.
+Later, if we use an “ownership challenge solution” to create a another transaction referencing that output, as outputs can only be 
+referenced at most once, it would mean we will no longer be able to use it, reducing the bitcoin amount we own.&lt;/p&gt;
+
+&lt;p&gt;And what are these “ownership challenge”s and “ownership challenge solution”s ? Both are pieces of programs using a custom language 
+called &lt;a href=&quot;https://en.bitcoin.it/wiki/Script&quot;&gt;Script&lt;/a&gt;, such when appended together yield &lt;strong&gt;true&lt;/strong&gt;. The “ownership challenge” part is 
+usually called &lt;strong&gt;scriptSig&lt;/strong&gt; and the “ownership challenge solution” called &lt;strong&gt;scriptPubKey&lt;/strong&gt;. Though this language is limited (not 
+turing-compatible), is able to codify an important range of conditions, from the one anyone is able to solved, to one nobody is.&lt;/p&gt;
+
+&lt;h4 id=&quot;bitcoin-addresses&quot;&gt;Bitcoin Addresses:&lt;/h4&gt;
+
+&lt;p&gt;When I first started reading about bitcoin (the documentation back then was much sparse and poor) I thought I got it till I reached the 
+&lt;strong&gt;scriptSig&lt;/strong&gt;/&lt;strong&gt;scriptPubKey&lt;/strong&gt; part, it was quiet a surprise, ¿what is an embedded language doing stuck there? I mean, it was not 
+fair, it was not mention on &lt;a href=&quot;https://bitcoin.org/bitcoin.pdf&quot;&gt;the original paper &lt;/a&gt; !!! Also, back then, I had not read anything that 
+could make me think there was that degree of liberty to define for each output an specific behavior.&lt;/p&gt;
+
+&lt;p&gt;The reason is simple, the typical transaction, like the ones described on the paper, are just one of the many usage it is possible to 
+configure using the Script; and though there are a lot of other possibilities, most of transactions work that way, following an specific 
+template for the &lt;strong&gt;scriptSig&lt;/strong&gt; and &lt;strong&gt;scriptPubKey&lt;/strong&gt; where transaction outputs are linked to the hash digest of some 
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Public-key_cryptography&quot;&gt;public key&lt;/a&gt;, in order to use them as input for a new transaction, the issuer will 
+have to prove its ownership signing the transaction he wants to create with the private key related with those public keys (as the proof is 
+part of the transaction itself, it is ignored when signed, otherwise it would lead to a recursive signature! you can see more details about 
+how it is actually signed &lt;a href=&quot;http://bitcoin.stackexchange.com/questions/3374/how-to-redeem-a-basic-tx&quot;&gt;here&lt;/a&gt; )(**)&lt;/p&gt;
+
+&lt;p&gt;These particular types of transactions are called P2PKH (pay-to-public-key-hash), an example of how these transactions are used could be:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;A vendor generate a couple of public/private keys.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The customer interested on a product/service ask the vendor for its public key.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The vendor gives the customer the &lt;strong&gt;hash&lt;/strong&gt; of his public key, and the amount he has to pay him.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The customer create a transaction with an outpoint with that specific amount and an P2KH &lt;strong&gt;scriptSig&lt;/strong&gt;  which can only be solved by 
+someone knowing the private key linked the public key from the received hash; as the only one knowing this is the vendor, this enforce 
+that only the vendor will be able to spent that transaction output.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The customer spread this transaction through the network of peers participating in the bitcoin protocol; after sometime, eventually 
+this transaction gets included on the blockchain.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The vendor detects the transaction has been included on the blockchain, that it contains the required amount and consider
+the payment done.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Bitcoin addresses are just an special plain text format (so they can be posted anywhere or used on QR codes) to represent these hashes, 
+using redundancy and avoiding ambiguous characters (like ‘l’ and ‘1’ or ‘0’  and ‘O’). You can check how they are actually 
+derivate &lt;a href=&quot;https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addresses&quot;&gt;here&lt;/a&gt;(**).&lt;/p&gt;
+
+&lt;p&gt;Thanks to its redundancy, it is almost imposible to send a transaction to the wrong guy just because some typos while writing down the 
+address (the errors will be detected and the transaction won’t ever make through). That said, it is still quiet possible, 
+to accidentally just copy&amp;amp;paste a whole different address, and in this case redundancy won’t help you not to sending it to the wrong guy, 
+so better check twice before sending a significant amount!.  &lt;/p&gt;
+
+&lt;p&gt;(*) That said, there other types of transactions, defining different  behaviors with interesting properties; these 
+unconventional transactions, are sometimes combined into a protocol defining the so called 
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Smart_contract&quot;&gt;smart-contracts&lt;/a&gt;. This is a incredible interesting topic, but there will be time 
+to speak about it onn another post!! &lt;/p&gt;
+
+&lt;p&gt;(**) Well, again, here we have simplified a bit, addresses can sometimes been used for different kind of transactions, those addresses 
+would have a slightly different format.&lt;/p&gt;
+
+&lt;h4 id=&quot;wallet&quot;&gt;Wallet:&lt;/h4&gt;
+
+&lt;p&gt;Bitcoin wallets are either the program used by the final users to manage their bitcoins (that is, to issue and detects transactions) 
+or the persistent data used by those programs. On the &lt;a href=&quot;/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-2-of-2.html&quot;&gt;next post&lt;/a&gt;,
+I’ll show you how we can implement a minimalistic command-line wallet using Haskell, you’ll see, it is actually quiet easy!!&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 20 Oct 2015 14:42:46 +0000</pubDate>
+        <link>http://vwwv.github.io/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html</link>
+        <guid isPermaLink="true">http://vwwv.github.io/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html</guid>
+        
+        
+        <category>haskell</category>
+        
+        <category>easy-bitcoin</category>
         
       </item>
     

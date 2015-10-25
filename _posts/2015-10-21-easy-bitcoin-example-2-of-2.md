@@ -4,6 +4,7 @@ title      :  "EasyBitcoin example: Creating a command-line wallet.(2/2)"
 date       : 2015-10-21 14:42:46
 categories : [haskell, easy-bitcoin]
 author     : "Alejandro Durán Pallarés"
+comments   : true
 ---
 
 

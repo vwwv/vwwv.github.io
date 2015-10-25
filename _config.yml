@@ -21,3 +21,11 @@ github_username  :  vwwv
 
 # Build settings
 markdown         : kramdown
+
+
+
+analytics :
+  provider : google 
+  google : 
+      tracking_id : 'UA-69260547-1'
+

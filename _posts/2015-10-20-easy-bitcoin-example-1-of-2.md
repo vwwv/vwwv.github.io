@@ -8,6 +8,8 @@ categories :
           - easy-bitcoin
 
 author     : "Alejandro Durán Pallarés"
+comments   : true
+
 ---
 
 

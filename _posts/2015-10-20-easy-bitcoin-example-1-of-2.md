@@ -71,7 +71,7 @@ The transaction issuer decide the implicit fee it has to pay, and could be any n
 the higher the chances the network will collaborate to include its transaction into the distributed database of transactions.
 
 When a reference to a transaction-output has not been referenced yet by some transaction input, it is called **UTXO**(unspent 
-transaction output). Within the *EasyBitcoin* library, references to transaction-outputs (whether they've been referenced or not) are 
+transaction output). Within the `EasyBitcoin` library, references to transaction-outputs (whether they've been referenced or not) are 
 called **Outpoint**.
 
 
@@ -87,7 +87,7 @@ Hypothetical bank account balance:
 
 
 An actual [bitcoin transaction](https://www.blocktrail.com/BTC/tx/ffe58cb9762dca10f085dcfc2549635a0dacf5653d71d3e9491e47780a05771c)
-(id: **bd37285a0d42c0811b63b5942a3fd7b0d8ba292a135a2350b2bad460a16f17cf** ):
+(id: `bd37285a0d42c0811b63b5942a3fd7b0d8ba292a135a2350b2bad460a16f17cf` ):
 
      input #0 (from transaction e1018f7fd13f3f410e5efac7cb26173f32494d8ceb3fce93ee995bd34fbf86fd 
                       output #0  10.55196835 BTC

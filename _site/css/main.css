@@ -106,6 +106,11 @@ code {
 code {
   padding: 1px 5px; }
 
+p code {
+  padding: 1px 5px;
+  background-color: #fc2;
+  font-weight: 700; }
+
 pre {
   padding: 8px 12px;
   overflow-x: scroll; }
@@ -326,7 +331,9 @@ body {
  * Posts
  */
 .post-header {
-  margin-bottom: 30px; }
+  margin-bottom: 30px;
+  margin-top: 16px;
+  margin-bottom: 96px; }
 
 .post-title {
   font-size: 42px;
@@ -343,16 +350,50 @@ body {
     @media screen and (max-width: 800px) {
       .post-content h2 {
         font-size: 28px; } }
+  .post-content p {
+    margin-top: 32px;
+    margin-bottom: 32px; }
   .post-content h3 {
-    font-size: 26px; }
+    font-size: 32px;
+    margin-top: 86px;
+    margin-bottom: 62px; }
     @media screen and (max-width: 800px) {
       .post-content h3 {
-        font-size: 22px; } }
+        font-size: 28px; } }
   .post-content h4 {
-    font-size: 20px; }
+    font-size: 20px;
+    display: inline-block;
+    margin-top: 62px;
+    margin-bottom: 32px;
+    padding: 8px;
+    color: #fc2;
+    background: #111; }
     @media screen and (max-width: 800px) {
       .post-content h4 {
         font-size: 18px; } }
+  .post-content ol {
+    counter-reset: li;
+    list-style: outside none none;
+    position: relative;
+    margin-left: 12px; }
+  .post-content ol > li {
+    position: relative;
+    padding-left: 50px; }
+    .post-content ol > li:before {
+      content: counter(li,decimal);
+      counter-increment: li;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      height: 100%;
+      width: 24px;
+      padding: 0px 10px 0px 0px;
+      color: #111;
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 35px;
+      text-align: left;
+      border-right: 2px solid #111; }
 
 /**
  * Syntax highlighting styles

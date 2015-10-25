@@ -242,12 +242,15 @@ body{
  */
 .post-header {
     margin-bottom: $spacing-unit;
+    margin-top: 16px;
+    margin-bottom: 96px;
 }
 
 .post-title {
     font-size: 42px;
     letter-spacing: -1px;
     line-height: 1;
+
 
     @include media-query($on-laptop) {
         font-size: 36px;
@@ -265,19 +268,61 @@ body{
         }
     }
 
+    p {
+        margin-top: 32px;
+        margin-bottom: 32px;
+    }
+
     h3 {
-        font-size: 26px;
+        font-size: 32px;
+        margin-top: 86px;
+        margin-bottom: 62px;
 
         @include media-query($on-laptop) {
-            font-size: 22px;
+            font-size: 28px;
         }
     }
 
     h4 {
         font-size: 20px;
+        display: inline-block;
+        margin-top: 62px;
+        margin-bottom: 32px;
+        padding: 8px;
+        color: #fc2;
+        background: #111;
 
         @include media-query($on-laptop) {
             font-size: 18px;
         }
     }
+    ol {
+        counter-reset: li;
+        list-style: outside none none;
+        position: relative;
+        margin-left: 12px;
+
+    }
+    ol > li {
+        position: relative;
+        padding-left: 50px;
+        &:before{
+            content: counter(li, decimal);
+            counter-increment: li;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 24px;
+            padding: 0px 10px 0px 0px;
+            color: #111;
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 35px;
+            text-align: left;
+            border-right: 2px solid #111;
+        }
+        
+    }
+
 }

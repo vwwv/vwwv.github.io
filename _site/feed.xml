@@ -5,8 +5,8 @@
     <description>A Personal Programming Blog</description>
     <link>http://vwwv.github.io/</link>
     <atom:link href="http://vwwv.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 25 Oct 2015 16:21:40 +0000</pubDate>
-    <lastBuildDate>Sun, 25 Oct 2015 16:21:40 +0000</lastBuildDate>
+    <pubDate>Sun, 25 Oct 2015 17:32:42 +0000</pubDate>
+    <lastBuildDate>Sun, 25 Oct 2015 17:32:42 +0000</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
@@ -345,7 +345,7 @@ the input minus the outputs).&lt;/p&gt;
 the higher the chances the network will collaborate to include its transaction into the distributed database of transactions.&lt;/p&gt;
 
 &lt;p&gt;When a reference to a transaction-output has not been referenced yet by some transaction input, it is called &lt;strong&gt;UTXO&lt;/strong&gt;(unspent 
-transaction output). Within the &lt;em&gt;EasyBitcoin&lt;/em&gt; library, references to transaction-outputs (whether they’ve been referenced or not) are 
+transaction output). Within the &lt;code&gt;EasyBitcoin&lt;/code&gt; library, references to transaction-outputs (whether they’ve been referenced or not) are 
 called &lt;strong&gt;Outpoint&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;p&gt;Hypothetical bank account balance:&lt;/p&gt;
@@ -359,7 +359,7 @@ called &lt;strong&gt;Outpoint&lt;/strong&gt;.&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;An actual &lt;a href=&quot;https://www.blocktrail.com/BTC/tx/ffe58cb9762dca10f085dcfc2549635a0dacf5653d71d3e9491e47780a05771c&quot;&gt;bitcoin transaction&lt;/a&gt;
-(id: &lt;strong&gt;bd37285a0d42c0811b63b5942a3fd7b0d8ba292a135a2350b2bad460a16f17cf&lt;/strong&gt; ):&lt;/p&gt;
+(id: &lt;code&gt;bd37285a0d42c0811b63b5942a3fd7b0d8ba292a135a2350b2bad460a16f17cf&lt;/code&gt; ):&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt; input #0 (from transaction e1018f7fd13f3f410e5efac7cb26173f32494d8ceb3fce93ee995bd34fbf86fd 
                   output #0  10.55196835 BTC

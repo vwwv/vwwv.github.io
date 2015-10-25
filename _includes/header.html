@@ -1,8 +1,17 @@
 <header class="site-header">
 
-  <div class="wrapper">
 
-    <a class="site-title" href="{{ site.baseurl }}/">{{ site.title }}</a>
+
+    <div class="site-branding">
+
+      <h1 class="site-title">
+        <a href="{{ site.baseurl }}/" rel="home">{{ site.title }}</a>
+      </h1>
+
+      <h2 class="site-description"> {{site.description}}</h2>
+
+    </div>
+
 
     <nav class="site-nav">
       <a href="#" class="menu-icon">
@@ -13,15 +22,19 @@
         </svg>
       </a>
 
+
+
+
       <div class="trigger">
+        <a class="page-link" href="https/github.com/vwwv"> Github </a>
         {% for page in site.pages %}
           {% if page.title %}
           <a class="page-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
           {% endif %}
         {% endfor %}
       </div>
-    </nav>
 
-  </div>
+
+    </nav>
 
 </header>

@@ -1,4 +1,12 @@
 /**
+ * Keep the behaviour as the wordpress version..
+ */
+html {
+    font-size: 56.5%;
+    /* Corrects text resizing oddly in IE6/7 when body font-size is set using em units http://clagnut.com/blog/348/#c790 */
+}
+
+/**
  * Reset some basic elements
  */
 body, h1, h2, h3, h4, h5, h6,
@@ -24,7 +32,7 @@ body {
 }
 
 
-
+ 
 /**
  * Set `margin-bottom` to maintain vertical rhythm
  */
@@ -81,6 +89,7 @@ li {
  */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 300;
+    font-family: $heading-fonts;
 }
 
 

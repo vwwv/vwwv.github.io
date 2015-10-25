@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>_THE_  spaghetti_code_ball</title>
-    <description>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
-</description>
+    <description>A Personal Programming Blog</description>
     <link>http://vwwv.github.io/</link>
     <atom:link href="http://vwwv.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 25 Oct 2015 07:38:01 +0000</pubDate>
-    <lastBuildDate>Sun, 25 Oct 2015 07:38:01 +0000</lastBuildDate>
+    <pubDate>Sun, 25 Oct 2015 16:21:40 +0000</pubDate>
+    <lastBuildDate>Sun, 25 Oct 2015 16:21:40 +0000</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>

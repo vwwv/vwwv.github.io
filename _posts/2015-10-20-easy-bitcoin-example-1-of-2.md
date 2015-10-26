@@ -27,11 +27,12 @@ In order to present `EasyBitcoin`, I'll show how to write a simple command-line 
   1. First, I'll make a quick overview of the bitcoin protocol for those who might not be that familiar with it; just to
      understand the application, so if you know a bit about the protocol, you can just skip this section. 
 
-  2. On the second [part](/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html), I'll introduce the actual code 
+  2. On the second [part]({% post_url 2015-10-21-easy-bitcoin-example-1-of-2 %}), I'll introduce the actual code 
      for the application, the interesting stuff.
 
 
-The library's documentation can be found [on hackage](www.example.com), and its source code [on github](www.example.com). If you find 
+The library's documentation can be found [on hackage](http://hackage.haskell.org/package/easy-bitcoin), and its source code 
+[on github](https://github.com/vwwv/easy-bitcoin). If you find 
 some trouble with it or have some suggestions I'd really apreciate your input; This is the first library I wrote, and to be honest, 
 I still feel there's so much I need to learn from the haskell community.  
 
@@ -183,6 +184,6 @@ would have a slightly different format.
 #### Wallet:
 
 Bitcoin wallets are either the program used by the final users to manage their bitcoins (that is, to issue and detects transactions) 
-or the persistent data used by those programs. On the [next post](/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-2-of-2.html),
+or the persistent data used by those programs. On the [next post]({% post_url 2015-10-21-easy-bitcoin-example-1-of-2 %}),
 I'll show you how we can implement a minimalistic command-line wallet using Haskell, you'll see, it is actually quiet easy!!
 

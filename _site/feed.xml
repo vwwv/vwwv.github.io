@@ -3,10 +3,10 @@
   <channel>
     <title>_THE_  spaghetti_code_ball</title>
     <description>A Personal Programming Blog</description>
-    <link>http://vwwv.github.io/</link>
-    <atom:link href="http://vwwv.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 25 Oct 2015 17:32:42 +0000</pubDate>
-    <lastBuildDate>Sun, 25 Oct 2015 17:32:42 +0000</lastBuildDate>
+    <link>http://the.spaghetticodeball.xyz/</link>
+    <atom:link href="http://the.spaghetticodeball.xyz/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Mon, 26 Oct 2015 16:55:17 +0000</pubDate>
+    <lastBuildDate>Mon, 26 Oct 2015 16:55:17 +0000</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
@@ -273,13 +273,13 @@ is not really a “secret”). The &lt;code&gt;EasyBitcoin&lt;/code&gt; library 
 &lt;p&gt;If you want to use the official bitcoin’d’ client, just adapt procedure &lt;code&gt;send&lt;/code&gt; and &lt;code&gt;readBlockExplorer&lt;/code&gt; to use 
 &lt;a href=&quot;https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list&quot;&gt;its API&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;You can find the &lt;code&gt;EasyBitcoin&lt;/code&gt; documentation on &lt;a href=&quot;www.example.com&quot;&gt;hackage&lt;/a&gt;; or just fire me a comment and I’ll try my best 
+&lt;p&gt;You can find the &lt;code&gt;EasyBitcoin&lt;/code&gt; documentation on &lt;a href=&quot;https://hackage.haskell.org/package/easy-bitcoin&quot;&gt;hackage&lt;/a&gt;; or just fire me a comment and I’ll try my best 
 to help :) &lt;/p&gt;
 
 </description>
         <pubDate>Wed, 21 Oct 2015 14:42:46 +0000</pubDate>
-        <link>http://vwwv.github.io/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html</link>
-        <guid isPermaLink="true">http://vwwv.github.io/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html</guid>
+        <link>http://the.spaghetticodeball.xyz/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html</link>
+        <guid isPermaLink="true">http://the.spaghetticodeball.xyz/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html</guid>
         
         
         <category>haskell</category>
@@ -309,7 +309,8 @@ for the application, the interesting stuff.&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;The library’s documentation can be found &lt;a href=&quot;www.example.com&quot;&gt;on hackage&lt;/a&gt;, and its source code &lt;a href=&quot;www.example.com&quot;&gt;on github&lt;/a&gt;. If you find 
+&lt;p&gt;The library’s documentation can be found &lt;a href=&quot;http://hackage.haskell.org/package/easy-bitcoin&quot;&gt;on hackage&lt;/a&gt;, and its source code 
+&lt;a href=&quot;https://github.com/vwwv/easy-bitcoin&quot;&gt;on github&lt;/a&gt;. If you find 
 some trouble with it or have some suggestions I’d really apreciate your input; This is the first library I wrote, and to be honest, 
 I still feel there’s so much I need to learn from the haskell community.  &lt;/p&gt;
 
@@ -458,13 +459,13 @@ would have a slightly different format.&lt;/p&gt;
 &lt;h4 id=&quot;wallet&quot;&gt;Wallet:&lt;/h4&gt;
 
 &lt;p&gt;Bitcoin wallets are either the program used by the final users to manage their bitcoins (that is, to issue and detects transactions) 
-or the persistent data used by those programs. On the &lt;a href=&quot;/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-2-of-2.html&quot;&gt;next post&lt;/a&gt;,
+or the persistent data used by those programs. On the &lt;a href=&quot;/haskell/easy-bitcoin/2015/10/21/easy-bitcoin-example-2-of-2.html&quot;&gt;next post&lt;/a&gt;,
 I’ll show you how we can implement a minimalistic command-line wallet using Haskell, you’ll see, it is actually quiet easy!!&lt;/p&gt;
 
 </description>
         <pubDate>Tue, 20 Oct 2015 14:42:46 +0000</pubDate>
-        <link>http://vwwv.github.io/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html</link>
-        <guid isPermaLink="true">http://vwwv.github.io/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html</guid>
+        <link>http://the.spaghetticodeball.xyz/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html</link>
+        <guid isPermaLink="true">http://the.spaghetticodeball.xyz/haskell/easy-bitcoin/2015/10/20/easy-bitcoin-example-1-of-2.html</guid>
         
         
         <category>haskell</category>

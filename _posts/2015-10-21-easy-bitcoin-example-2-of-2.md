@@ -318,7 +318,7 @@ is not really a "secret"). The `EasyBitcoin` library accept both WIF and BIP0032
 If you want to use the official bitcoin'd' client, just adapt procedure `send` and `readBlockExplorer` to use 
 [its API](https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list).
 
-You can find the `EasyBitcoin` documentation on [hackage](www.example.com); or just fire me a comment and I'll try my best 
+You can find the `EasyBitcoin` documentation on [hackage](https://hackage.haskell.org/package/easy-bitcoin); or just fire me a comment and I'll try my best 
 to help :) 
 
 

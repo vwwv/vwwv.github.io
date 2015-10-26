@@ -12,7 +12,7 @@ long_description :  A Personal Programming Blog
 
 baseurl          : "" # the subpath of your site, e.g. /blog/
 
-url              : "http://vwwv.github.io" # the base hostname & protocol for your site
+url              : "http://the.spaghetticodeball.xyz" # the base hostname & protocol for your site
 
 twitter_username : false
 
@@ -21,4 +21,4 @@ github_username  :  vwwv
 # Build settings
 markdown         : kramdown
 
-production       : false
+production       : true

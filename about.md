@@ -21,5 +21,5 @@ don’t hesitate to get in contact with me or to  take a look at my [UpWork prof
 
 The name of the blog, the big spaghetti code ball, came after reading a big, messy, over-complicated Java code; so ugly 
 and exagerated (objects calling objects calling back theirselves, inheriting from 5-words-composed classes implementing 
-hyped "OOP patterns"™, objects as arguments to dispatch the dispatcher for the scheduler…you know, Java…). Anyway, after 
-that, was so frustrated, I really need to talk about it, but working remotely makes it not as simple as one’d like…
+"OOP patterns"™, dispatcher dispaching dispaches factories…). Anyway, after that, was so frustrated, I really need to talk 
+about it…

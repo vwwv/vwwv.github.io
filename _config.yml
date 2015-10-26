@@ -14,6 +14,8 @@ baseurl          : "" # the subpath of your site, e.g. /blog/
 
 url              : "http://the.spaghetticodeball.xyz" # the base hostname & protocol for your site
 
+upwork           : "https://www.upwork.com/o/profiles/users/_~014a50cec3ebecd362/"
+
 twitter_username : false
 
 github_username  :  vwwv

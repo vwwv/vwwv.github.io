@@ -14,7 +14,7 @@ developing, and to exposure whatever I find interesting about technology in gene
 The areas I feel more confident with are functional programming, cryptocurrencies such bitcoin, custom scripts 
 implementation to handle data or manage systems, and TOR hidden services development; I’ll try to keep writing posts 
 about these topics from time to time.  Also if you are looking for a developer and feel I could fit for the task, 
-don’t hesitate to get in contact with me or to  take a look at my [UpWork profile](www.example.com) (*)
+don’t hesitate to get in contact with me or to  take a look at my [UpWork profile]({{site.upwork}}) (*)
 
 
 ### The blog’s name:

@@ -27,12 +27,11 @@ writing haskell bindings to them; I could not find anything related, so I decide
 The idea is very simple: being able to transform haskell code into a javascript promise, and being able to execute a javascript
 promise from haskell. In order to do this, in `ghcjs-promise` you have 2 functions:
 
-- `await`  : takes a promise, and yields its result haskell side. It returns its result inside an `Either`, so you can now 
-             whether it produced an exception or not.
-
-  ``` 
-  Promise -> IO (Either JSVal JSVal)
-  ```
+- `await`  : takes a promise, and yields its result haskell side. It returns its result inside an `Either`, so you can now whether it produced an exception or not.
+   
+   ```
+   Promise -> IO (Either JSVal JSVal)
+   ```
 
 - `promise`: takes a haskell procedure yielding a javascript value, and returns a promise.
 

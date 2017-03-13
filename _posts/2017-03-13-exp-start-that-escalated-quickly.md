@@ -336,7 +336,7 @@ Ummm, seems to work, but now is when we're reaching the interesting part, let's 
 
 {% endhighlight %}
 
-Yes, that was the reason I could not manually found the number.
+Yes, that was the reason I could not manually find the number.
 
 
 ![oh boy! That escalated quickly ](https://raw.githubusercontent.com/vwwv/vwwv.github.io/master/assets/c41220cfe4f7c510921d0f7dfa32199ff6b4ac6d7613ce0344335d6e723e5fb6.jpg)

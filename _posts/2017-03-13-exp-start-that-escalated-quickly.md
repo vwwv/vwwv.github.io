@@ -76,7 +76,7 @@ With this tool, finding a number such applied to the _log *_ function yields 5 o
 
 {% highlight haskell  %}
 >>> expStart 3
-3
+4
 >>> expStart 4
 16
 >>> expStart 5

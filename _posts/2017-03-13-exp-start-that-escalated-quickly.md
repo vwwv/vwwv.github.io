@@ -33,13 +33,13 @@ result would be greater than 6 ! You could count any atom on the universe a mill
 Well even though I have no access to any super massive computer grid, I'm pretty confident about my `dell` laptop (if it can't, sure nothing else can't __/s__), so I quickly
 turned it on, started a `ghci` session, and give it a shot:
 
-First, defined _log *_
+First, defined _log *_ as :
 
 {% highlight haskell  %}
 let logStart x = if x < 2 then 1 else 1 + logStart (log x / log 2)
 {% endhighlight %}
 
-Then check with a couple of numbers:
+Check a couple of numbers:
 
 {% highlight haskell  %}
 >>> logStart 1

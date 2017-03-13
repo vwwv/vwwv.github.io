@@ -69,7 +69,7 @@ ladies and gentlemen the _log *_ inverse, here it is, the _exp *_ function:
 
 
 {% highlight haskell  %}
-let expStart x = if x < 2 then 1 else 2 ^ (expStart (x-1))
+let expStart x = if x < 2 then 1 else 2 ^ expStart (x-1)
 {% endhighlight %}
 
 With this tool, finding a number such applied to the _log *_ function yields 5 or more should be trivial, let's try:

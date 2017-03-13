@@ -18,9 +18,9 @@ is commonly used to describe some algorithm and data structure complexity, such 
 and it is defined as:
 
 
-```haskell
+{% highlight haskell  %}
 logStart x = if x < 2 then 1 else 1 + logStart (log x / log 2)
-```
+{% endhighlight %}
 
 Yes sure, It's slow, but how slow? It's hard to get an intuitive idea about it, what it really took my attention, was the claim
 that no matter what you apply, the result would be always 6 or less. Of course this claim is not true from a theoretic point of 
@@ -35,13 +35,13 @@ turned it on, started a `ghci` session, and give it a shot:
 
 First, defined _log *_
 
-```haskell
+{% highlight haskell  %}
 let logStart x = if x < 2 then 1 else 1 + logStart (log x / log 2)
-```
+{% endhighlight %}
 
 Then check with a couple of numbers:
 
-```
+{% highlight haskell  %}
 >>> logStart 1
 1
 >>> logStart 2
@@ -52,39 +52,39 @@ Then check with a couple of numbers:
 4
 >>> logStart 100000
 5
-```
+{% endhighlight %}
 So far so good, was not that complicated finding values for 1,2,3,4 and 5 ! Now things start getting rough, what would we need to yield 6?
 Well, again let's give it some shots:
 
-```
+{% highlight haskell  %}
 >>> logStart 999999999999999999
 5
 >>> logStart 999999999999999999999999999999999999
 5
 >>> logStart 99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 5
-```
+{% endhighlight %}
 Ummmm, no luck, after manually trying tons of inputs I gave up; time for an smarter approach: Let me introduce you 
 ladies and gentlemen the _log *_ inverse, here it is, the _exp *_ function:
 
 
-```
+{% highlight haskell  %}
 let expStart x = if x < 2 then 1 else 2 ^ (expStart (x-1))
-```
+{% endhighlight %}
 
 With this tool, finding a number such applied to the _log *_ function yields 5 or more should be trivial, let's try:
 
-```
+{% highlight haskell  %}
 >>> expStart 3
 3
 >>> expStart 4
 16
 >>> expStart 5
 65536
-```
+{% endhighlight %}
 Ummm, seems to work, but now is when we're reaching the interesting part, let's not longer wait for it and compute `expStart 6` : 
 
-``` 
+{% highlight haskell  %}
 >>> expStart 6
 20035299304068464649790723515602557504478254755697514192650169737108940595563114
 53089506130880933348101038234342907263181822949382118812668869506364761547029165
@@ -334,7 +334,7 @@ Ummm, seems to work, but now is when we're reaching the interesting part, let's 
 59888384311451189488055212914577569914657753004138471712457796504817585639507289
 5337539755822087777506072339445587895905719156736
 
-```
+{% endhighlight %}
 
 Yes, that was the reason I could not manually found the number.
 
@@ -344,13 +344,13 @@ Yes, that was the reason I could not manually found the number.
 
 Even though that number looks incredible big, it only took `ghci` 0.07 seconds to compute it. Maybe we  can find the next one! For sure it is too big to print it on the screen, so let's just make some tiny tests:
 
-```
+{% highlight haskell  %}
 >>> logStart (expStart 7) == 7
 .....stack overflow....
 
 >>> expStart 7 == 2^(2^(2^(2^(2^(2^(2^0))))))
 .....stack overflow....
-```
+{% endhighlight %}
 
 Sadly, that was too much for my beloved laptop...
 
